@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": "Naruto",
+    "thumbnail": "https://picsum.photos/seed/naruto/400/225",
+    "description": "A young ninja who seeks recognition from his peers and dreams of becoming the Hokage."
+  },
+  {
+    "id": 2,
+    "title": "One Piece",
+    "thumbnail": "https://picsum.photos/seed/onepiece/400/225",
+    "description": "Monkey D. Luffy and his pirate crew in search of the ultimate treasure, One Piece."
+  },
+  {
+    "id": 3,
+    "title": "Attack on Titan",
+    "thumbnail": "https://picsum.photos/seed/aot/400/225",
+    "description": "Humans fight for survival against giant humanoid creatures known as Titans."
+  },
+  {
+    "id": 4,
+    "title": "Demon Slayer",
+    "thumbnail": "https://picsum.photos/seed/demonslayer/400/225",
+    "description": "A young boy becomes a demon slayer after his family is slaughtered and his sister turned into a demon."
+  }
+]

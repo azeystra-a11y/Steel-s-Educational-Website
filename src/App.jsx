@@ -4,11 +4,13 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Search, Cat, X, Maximize2, Minimize2 } from 'lucide-react';
+import { Search, Cat, X, Maximize2, Minimize2, Play, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { HashRouter as Router, Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import gamesData from './games.json';
+import animeData from './anime.json';
 
-export default function App() {
+function GamesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGame, setSelectedGame] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -24,28 +26,20 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-purple-500 selection:text-white">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-md border-b border-purple-500/30 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tighter uppercase italic">
-              Steel's <span className="text-purple-400">Website</span>
-            </h1>
-          </div>
-
-          <div className="relative group max-w-md w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-purple-400 transition-colors" />
-            <input
-              type="text"
-              placeholder="Search games..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-purple-500/20 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder:text-white/20"
-            />
-          </div>
+    <>
+      {/* Search Bar */}
+      <div className="max-w-7xl mx-auto px-6 pt-8">
+        <div className="relative group max-w-md mx-auto">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-purple-400 transition-colors" />
+          <input
+            type="text"
+            placeholder="Search games..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-white/5 border border-purple-500/20 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder:text-white/20"
+          />
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-12">
@@ -156,21 +150,145 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+    </>
+  );
+}
 
-      {/* Footer */}
-      <footer className="border-t border-purple-500/20 py-12 px-6 mt-12 bg-black">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-3 opacity-50">
-            <Cat className="w-5 h-5 text-purple-400" />
-            <span className="font-bold tracking-tighter uppercase italic text-sm">
-              Steel's Website
-            </span>
-          </div>
-          <p className="text-xs text-white/20">
-            © {new Date().getFullYear()} Steel's Website. All rights reserved.
-          </p>
+function AnimePage() {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredAnime = useMemo(() => {
+    return animeData.filter(anime =>
+      anime.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
+
+  return (
+    <>
+      {/* Search Bar */}
+      <div className="max-w-7xl mx-auto px-6 pt-8">
+        <div className="relative group max-w-md mx-auto">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-purple-400 transition-colors" />
+          <input
+            type="text"
+            placeholder="Search anime..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-white/5 border border-purple-500/20 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder:text-white/20"
+          />
         </div>
-      </footer>
-    </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-6 py-12">
+        {filteredAnime.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredAnime.map((anime) => (
+              <motion.div
+                key={anime.id}
+                whileHover={{ y: -5 }}
+                className="group bg-black border border-purple-500/20 rounded-2xl overflow-hidden hover:border-purple-500 transition-colors shadow-[0_0_10px_rgba(168,85,247,0.05)] hover:shadow-[0_0_20px_rgba(168,85,247,0.2)]"
+                id={`anime-card-${anime.id}`}
+              >
+                <div className="aspect-video relative overflow-hidden bg-[#050505]">
+                  <img
+                    src={anime.thumbnail}
+                    alt={anime.title}
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-70 group-hover:opacity-100"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                    <span className="bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
+                      Watch Now
+                    </span>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-lg group-hover:text-purple-400 transition-colors truncate">
+                    {anime.title}
+                  </h3>
+                  <p className="text-xs text-white/40 mt-2 line-clamp-2">
+                    {anime.description}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="bg-white/5 p-6 rounded-full mb-4 border border-purple-500/20">
+              <Search className="w-12 h-12 text-white/20" />
+            </div>
+            <h2 className="text-2xl font-bold mb-2">No anime found</h2>
+            <p className="text-white/40">Try searching for something else</p>
+          </div>
+        )}
+      </main>
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <Router>
+      <div className="min-h-screen bg-black text-white font-sans selection:bg-purple-500 selection:text-white flex flex-col">
+        {/* Header */}
+        <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-md border-b border-purple-500/30 px-6 py-4">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-8">
+              <h1 className="text-2xl font-bold tracking-tighter uppercase italic">
+                Steel's <span className="text-purple-400">Website</span>
+              </h1>
+              
+              <nav className="flex items-center gap-6">
+                <NavLink 
+                  to="/" 
+                  className={({ isActive }) => 
+                    `text-sm font-bold uppercase tracking-widest transition-colors hover:text-purple-400 ${
+                      isActive ? 'text-purple-400 border-b-2 border-purple-400 pb-1' : 'text-white/60'
+                    }`
+                  }
+                >
+                  Games
+                </NavLink>
+                <NavLink 
+                  to="/anime" 
+                  className={({ isActive }) => 
+                    `text-sm font-bold uppercase tracking-widest transition-colors hover:text-purple-400 ${
+                      isActive ? 'text-purple-400 border-b-2 border-purple-400 pb-1' : 'text-white/60'
+                    }`
+                  }
+                >
+                  Anime
+                </NavLink>
+              </nav>
+            </div>
+          </div>
+        </header>
+
+        {/* Content */}
+        <div className="flex-1">
+          <Routes>
+            <Route path="/" element={<GamesPage />} />
+            <Route path="/anime" element={<AnimePage />} />
+          </Routes>
+        </div>
+
+        {/* Footer */}
+        <footer className="border-t border-purple-500/20 py-12 px-6 mt-12 bg-black">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div className="flex items-center gap-3 opacity-50">
+              <Cat className="w-5 h-5 text-purple-400" />
+              <span className="font-bold tracking-tighter uppercase italic text-sm">
+                Steel's Website
+              </span>
+            </div>
+            <p className="text-xs text-white/20">
+              © {new Date().getFullYear()} Steel's Website. All rights reserved.
+            </p>
+          </div>
+        </footer>
+      </div>
+    </Router>
   );
 }
