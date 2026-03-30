@@ -4,7 +4,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Search, Gamepad2, X, Maximize2, Minimize2 } from 'lucide-react';
+import { Search, Cat, X, Maximize2, Minimize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import gamesData from './games.json';
 
@@ -24,27 +24,24 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-orange-500 selection:text-black">
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-purple-500 selection:text-white">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/10 px-6 py-4">
+      <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-md border-b border-purple-500/30 px-6 py-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="bg-orange-500 p-2 rounded-lg">
-              <Gamepad2 className="w-6 h-6 text-black" />
-            </div>
             <h1 className="text-2xl font-bold tracking-tighter uppercase italic">
-              Unblocked<span className="text-orange-500">Hub</span>
+              Steel's <span className="text-purple-400">Website</span>
             </h1>
           </div>
 
           <div className="relative group max-w-md w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-orange-500 transition-colors" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-purple-400 transition-colors" />
             <input
               type="text"
               placeholder="Search games..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all placeholder:text-white/20"
+              className="w-full bg-white/5 border border-purple-500/20 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder:text-white/20"
             />
           </div>
         </div>
@@ -60,24 +57,24 @@ export default function App() {
                 layoutId={`game-${game.id}`}
                 whileHover={{ y: -5 }}
                 onClick={() => setSelectedGame(game)}
-                className="group cursor-pointer bg-[#141414] border border-white/5 rounded-2xl overflow-hidden hover:border-orange-500/50 transition-colors"
+                className="group cursor-pointer bg-black border border-purple-500/20 rounded-2xl overflow-hidden hover:border-purple-500 transition-colors shadow-[0_0_10px_rgba(168,85,247,0.05)] hover:shadow-[0_0_20px_rgba(168,85,247,0.2)]"
                 id={`game-card-${game.id}`}
               >
-                <div className="aspect-video relative overflow-hidden bg-[#1a1a1a]">
+                <div className="aspect-video relative overflow-hidden bg-[#050505]">
                   <img
                     src={game.thumbnail}
                     alt={game.title}
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80 group-hover:opacity-100"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-70 group-hover:opacity-100"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                    <span className="bg-orange-500 text-black text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                    <span className="bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
                       Play Now
                     </span>
                   </div>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-bold text-lg group-hover:text-orange-500 transition-colors truncate">
+                  <h3 className="font-bold text-lg group-hover:text-purple-400 transition-colors truncate">
                     {game.title}
                   </h3>
                 </div>
@@ -86,7 +83,7 @@ export default function App() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="bg-white/5 p-6 rounded-full mb-4">
+            <div className="bg-white/5 p-6 rounded-full mb-4 border border-purple-500/20">
               <Search className="w-12 h-12 text-white/20" />
             </div>
             <h2 className="text-2xl font-bold mb-2">No games found</h2>
@@ -106,16 +103,13 @@ export default function App() {
           >
             <motion.div
               layoutId={`game-${selectedGame.id}`}
-              className={`bg-[#0a0a0a] w-full h-full flex flex-col shadow-2xl overflow-hidden ${
-                isFullscreen ? 'fixed inset-0 rounded-0' : 'max-w-6xl max-h-[90vh] md:rounded-3xl border border-white/10'
+              className={`bg-black w-full h-full flex flex-col shadow-2xl overflow-hidden border border-purple-500/30 ${
+                isFullscreen ? 'fixed inset-0 rounded-0 border-0' : 'max-w-6xl max-h-[90vh] md:rounded-3xl'
               }`}
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#141414]">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-purple-500/20 bg-black">
                 <div className="flex items-center gap-3">
-                  <div className="bg-orange-500 p-1.5 rounded-md">
-                    <Gamepad2 className="w-4 h-4 text-black" />
-                  </div>
                   <h2 className="font-bold text-lg truncate max-w-[200px] md:max-w-md">
                     {selectedGame.title}
                   </h2>
@@ -123,7 +117,7 @@ export default function App() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={toggleFullscreen}
-                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/60 hover:text-white"
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/60 hover:text-purple-400"
                     title="Toggle Fullscreen"
                     id="btn-fullscreen"
                   >
@@ -134,7 +128,7 @@ export default function App() {
                       setSelectedGame(null);
                       setIsFullscreen(false);
                     }}
-                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/60 hover:text-white"
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/60 hover:text-red-400"
                     id="btn-close-modal"
                   >
                     <X className="w-6 h-6" />
@@ -154,7 +148,7 @@ export default function App() {
               </div>
 
               {/* Modal Footer */}
-              <div className="px-6 py-3 bg-[#141414] border-t border-white/10 flex justify-between items-center text-xs text-white/40">
+              <div className="px-6 py-3 bg-black border-t border-purple-500/20 flex justify-between items-center text-xs text-white/40">
                 <span>Playing: {selectedGame.title}</span>
                 <span className="hidden md:inline">Press ESC to exit fullscreen</span>
               </div>
@@ -164,22 +158,16 @@ export default function App() {
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-12 px-6 mt-12">
+      <footer className="border-t border-purple-500/20 py-12 px-6 mt-12 bg-black">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-3 opacity-50">
-            <Gamepad2 className="w-5 h-5" />
+            <Cat className="w-5 h-5 text-purple-400" />
             <span className="font-bold tracking-tighter uppercase italic text-sm">
-              Unblocked Hub
+              Steel's Website
             </span>
           </div>
-          <div className="flex gap-8 text-sm text-white/40">
-            <a href="#" className="hover:text-orange-500 transition-colors">Home</a>
-            <a href="#" className="hover:text-orange-500 transition-colors">Games</a>
-            <a href="#" className="hover:text-orange-500 transition-colors">About</a>
-            <a href="#" className="hover:text-orange-500 transition-colors">Contact</a>
-          </div>
           <p className="text-xs text-white/20">
-            © {new Date().getFullYear()} Unblocked Hub. All rights reserved.
+            © {new Date().getFullYear()} Steel's Website. All rights reserved.
           </p>
         </div>
       </footer>
