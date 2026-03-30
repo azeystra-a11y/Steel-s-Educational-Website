@@ -1,20 +1,31 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Unblocked Games Hub
 
-# Run and deploy your AI Studio app
+A modern, responsive collection of unblocked web games accessible via iframes.
 
-This contains everything you need to run your app locally.
+## Features
+- **Game Grid**: Clean, dark-themed UI.
+- **Search**: Real-time game filtering.
+- **Iframe Integration**: Play games directly in a modal overlay.
+- **Responsive**: Works on desktop and mobile.
 
-View your app in AI Studio: https://ai.studio/apps/d444b921-bab8-4645-a64c-73e3b57a1fac
+## Tech Stack
+- **React** (JavaScript)
+- **Tailwind CSS** (Styling)
+- **Framer Motion** (Animations)
+- **Vite** (Build Tool)
 
-## Run Locally
+## Getting Started
 
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. Clone the repository.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+4. Build for production:
+   ```bash
+   npm run build
+   ```
