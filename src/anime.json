@@ -3,24 +3,60 @@
     "id": 1,
     "title": "Naruto",
     "thumbnail": "https://picsum.photos/seed/naruto/400/225",
-    "description": "A young ninja who seeks recognition from his peers and dreams of becoming the Hokage."
+    "description": "A young ninja who seeks recognition from his peers and dreams of becoming the Hokage. Naruto Uzumaki, a hyperactive and knuckle-headed ninja, lives in Konohagakure, the Hidden Leaf Village. Moments before his birth, a huge demon known as the Kyuubi, the Nine-Tailed Fox, attacked Konohagakure and wreaked havoc.",
+    "episodes": 220,
+    "embedUrl": "https://vidsrc.me/embed/anime/naruto",
+    "genres": ["Action", "Adventure", "Fantasy"],
+    "status": "Completed",
+    "rating": "8.0",
+    "year": "2002"
   },
   {
     "id": 2,
-    "title": "One Piece",
-    "thumbnail": "https://picsum.photos/seed/onepiece/400/225",
-    "description": "Monkey D. Luffy and his pirate crew in search of the ultimate treasure, One Piece."
+    "title": "Naruto Shippuden",
+    "thumbnail": "https://picsum.photos/seed/shippuden/400/225",
+    "description": "It has been two and a half years since Naruto Uzumaki left Konohagakure, the Hidden Leaf Village, for intense training following events which fueled his desire to be stronger. Now Akatsuki, the mysterious organization of elite rogue ninja, is closing in on their grand plan which may threaten the safety of the entire shinobi world.",
+    "episodes": 500,
+    "embedUrl": "https://vidsrc.me/embed/anime/naruto-shippuden",
+    "genres": ["Action", "Adventure", "Fantasy"],
+    "status": "Completed",
+    "rating": "8.2",
+    "year": "2007"
   },
   {
     "id": 3,
-    "title": "Attack on Titan",
-    "thumbnail": "https://picsum.photos/seed/aot/400/225",
-    "description": "Humans fight for survival against giant humanoid creatures known as Titans."
+    "title": "One Piece",
+    "thumbnail": "https://picsum.photos/seed/onepiece/400/225",
+    "description": "Monkey D. Luffy and his pirate crew in search of the ultimate treasure, One Piece. Gol D. Roger was known as the 'Pirate King', the strongest and most infamous being to have sailed the Grand Line.",
+    "episodes": 1100,
+    "embedUrl": "https://vidsrc.me/embed/anime/one-piece",
+    "genres": ["Action", "Adventure", "Comedy"],
+    "status": "Ongoing",
+    "rating": "8.9",
+    "year": "1999"
   },
   {
     "id": 4,
+    "title": "Attack on Titan",
+    "thumbnail": "https://picsum.photos/seed/aot/400/225",
+    "description": "Humans fight for survival against giant humanoid creatures known as Titans. Centuries ago, mankind was slaughtered to near extinction by monstrous humanoid creatures called titans, forcing humans to hide in fear behind enormous concentric walls.",
+    "episodes": 88,
+    "embedUrl": "https://vidsrc.me/embed/anime/attack-on-titan",
+    "genres": ["Action", "Drama", "Fantasy"],
+    "status": "Completed",
+    "rating": "9.1",
+    "year": "2013"
+  },
+  {
+    "id": 5,
     "title": "Demon Slayer",
     "thumbnail": "https://picsum.photos/seed/demonslayer/400/225",
-    "description": "A young boy becomes a demon slayer after his family is slaughtered and his sister turned into a demon."
+    "description": "A young boy becomes a demon slayer after his family is slaughtered and his sister turned into a demon. Ever since the death of his father, the burden of supporting the family has fallen upon Tanjirou Kamado's shoulders.",
+    "episodes": 55,
+    "embedUrl": "https://vidsrc.me/embed/anime/demon-slayer",
+    "genres": ["Action", "Fantasy"],
+    "status": "Ongoing",
+    "rating": "8.7",
+    "year": "2019"
   }
 ]
