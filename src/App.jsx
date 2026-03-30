@@ -4,7 +4,7 @@
  */
 
 import { useState, useMemo, useEffect } from 'react';
-import { Search, Cat, X, Maximize2, Minimize2, Play, Info, ChevronLeft, ChevronRight, List } from 'lucide-react';
+import { Search, Cat, X, Maximize2, Minimize2, Play, Info, ChevronLeft, ChevronRight, List, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { HashRouter as Router, Routes, Route, NavLink, useLocation, useParams, Link, useSearchParams } from 'react-router-dom';
 import gamesData from './games.json';
@@ -214,6 +214,19 @@ function AnimePage() {
                     <p className="text-xs text-white/40 mt-2 line-clamp-2">
                       {anime.description}
                     </p>
+                    
+                    {/* Progress Indicator */}
+                    {localStorage.getItem(`anime_progress_${anime.id}`) && (
+                      <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest">
+                          Last: Ep {localStorage.getItem(`anime_progress_${anime.id}`)}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <div className="w-1 h-1 bg-purple-500 rounded-full animate-pulse"></div>
+                          <span className="text-[10px] text-white/20 uppercase tracking-widest">In Progress</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               </Link>
@@ -240,12 +253,24 @@ function AnimePlayerPage() {
   const [epSearch, setEpSearch] = useState('');
   const [server, setServer] = useState('VidSrc');
   const [isLoading, setIsLoading] = useState(true);
+  const [activeGroup, setActiveGroup] = useState(0);
   
   const anime = useMemo(() => animeData.find(a => a.id === parseInt(id)), [id]);
 
+  // Save progress
+  useEffect(() => {
+    if (anime) {
+      localStorage.setItem(`anime_progress_${anime.id}`, currentEp.toString());
+    }
+  }, [currentEp, anime]);
+
   useEffect(() => {
     setIsLoading(true);
-  }, [currentEp, server]);
+    // Set active group based on current episode
+    if (anime) {
+      setActiveGroup(Math.floor((currentEp - 1) / 100));
+    }
+  }, [currentEp, server, anime]);
 
   if (!anime) {
     return (
@@ -261,9 +286,31 @@ function AnimePlayerPage() {
     setEpSearch('');
   };
 
-  // Generate episode list
+  // Generate episode list and groups
   const episodes = Array.from({ length: anime.episodes || 1 }, (_, i) => i + 1);
-  const filteredEpisodes = episodes.filter(ep => ep.toString().includes(epSearch));
+  const groups = [];
+  for (let i = 0; i < episodes.length; i += 100) {
+    groups.push(episodes.slice(i, i + 100));
+  }
+
+  const currentGroupEpisodes = groups[activeGroup] || [];
+  const filteredEpisodes = currentGroupEpisodes.filter(ep => ep.toString().includes(epSearch));
+
+  // Construct Player URL based on server
+  const getPlayerUrl = () => {
+    const slug = anime.title.toLowerCase().replace(/\s+/g, '-');
+    // Common patterns for anime embeds
+    if (server === 'VidSrc') {
+      return `https://vidsrc.me/embed/anime?last_episode=1&title=${slug}&episode=${currentEp}`;
+    } else if (server === 'V2') {
+      return `https://vidsrc.to/embed/anime/${slug}/ep-${currentEp}`;
+    } else if (server === 'V3') {
+      return `https://vidsrc.xyz/embed/anime/${slug}/${currentEp}`;
+    } else if (server === 'V4') {
+      return `https://vidsrc.cc/v2/embed/anime/${slug}/${currentEp}`;
+    }
+    return `https://vidsrc.me/embed/anime?last_episode=1&title=${slug}&episode=${currentEp}`;
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -285,7 +332,7 @@ function AnimePlayerPage() {
         
         {/* Server Selector */}
         <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-purple-500/10">
-          {['VidSrc', 'Gogo', 'Zoro'].map((s) => (
+          {['VidSrc', 'V2', 'V3', 'V4'].map((s) => (
             <button
               key={s}
               onClick={() => setServer(s)}
@@ -307,11 +354,15 @@ function AnimePlayerPage() {
           <div className="aspect-video bg-black rounded-3xl overflow-hidden border border-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.15)] relative group">
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
-                <div className="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin"></div>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin"></div>
+                  <p className="text-xs font-bold text-white/40 uppercase tracking-widest">Loading {server} Server...</p>
+                </div>
               </div>
             )}
             <iframe
-              src={`${anime.embedUrl || 'https://vidsrc.me/embed/anime/naruto'}/${currentEp}`}
+              key={`${server}-${currentEp}`} // Force re-render on server/ep change
+              src={getPlayerUrl()}
               className="w-full h-full border-none"
               title={`${anime.title} - Episode ${currentEp}`}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -332,14 +383,28 @@ function AnimePlayerPage() {
             </button>
             
             <div className="flex items-center gap-4">
-              <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/5">
-                <Play className="w-3 h-3 text-purple-400 fill-current" />
-                <span className="text-xs font-bold text-white/60 uppercase tracking-widest">Auto Play</span>
-              </div>
-              <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/5">
-                <Play className="w-3 h-3 text-purple-400 fill-current" />
-                <span className="text-xs font-bold text-white/60 uppercase tracking-widest">Auto Next</span>
-              </div>
+              <button 
+                onClick={() => {
+                  setIsLoading(true);
+                  const currentServer = server;
+                  setServer(''); // Briefly clear to force re-render
+                  setTimeout(() => setServer(currentServer), 50);
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all group"
+              >
+                <RefreshCw className="w-3 h-3 text-white/40 group-hover:rotate-180 transition-transform" />
+                <span className="text-xs font-bold text-white/40 uppercase tracking-widest">Refresh</span>
+              </button>
+              <button 
+                onClick={() => {
+                  const nextServer = server === 'VidSrc' ? 'Gogo' : server === 'Gogo' ? 'Zoro' : 'VidSrc';
+                  setServer(nextServer);
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 rounded-xl border border-red-500/20 transition-all group"
+              >
+                <X className="w-3 h-3 text-red-400 group-hover:rotate-90 transition-transform" />
+                <span className="text-xs font-bold text-red-400 uppercase tracking-widest">Fix Error</span>
+              </button>
             </div>
 
             <button
@@ -404,6 +469,26 @@ function AnimePlayerPage() {
                 <List className="w-5 h-5 text-purple-400" />
                 <h3 className="font-bold uppercase tracking-widest text-sm">Episodes</h3>
               </div>
+              
+              {/* Group Selector */}
+              {groups.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-4 mb-4 custom-scrollbar no-scrollbar">
+                  {groups.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveGroup(idx)}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold whitespace-nowrap transition-all border ${
+                        activeGroup === idx 
+                          ? 'bg-purple-500 border-purple-500 text-white' 
+                          : 'bg-white/5 border-white/5 text-white/40 hover:text-white/60'
+                      }`}
+                    >
+                      {idx * 100 + 1}-{Math.min((idx + 1) * 100, episodes.length)}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-white/20" />
                 <input
@@ -438,7 +523,7 @@ function AnimePlayerPage() {
                   </button>
                 ))
               ) : (
-                <div className="text-center py-12 text-white/20 text-xs">No episodes found</div>
+                <div className="text-center py-12 text-white/20 text-xs">No episodes found in this range</div>
               )}
             </div>
           </div>
