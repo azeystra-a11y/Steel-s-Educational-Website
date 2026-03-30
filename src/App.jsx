@@ -156,22 +156,76 @@ function GamesPage() {
 
 function AnimePage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [apiAnime, setApiAnime] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const filteredAnime = useMemo(() => {
-    return animeData.filter(anime =>
-      anime.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+  // Fetch popular anime on mount
+  useEffect(() => {
+    const fetchPopular = async () => {
+      try {
+        const res = await fetch('https://api.jikan.moe/v4/top/anime?limit=20');
+        const data = await res.json();
+        if (data.data) {
+          setApiAnime(data.data.map(a => ({
+            id: a.mal_id,
+            title: a.title,
+            thumbnail: a.images.jpg.large_image_url,
+            description: a.synopsis,
+            episodes: a.episodes,
+            status: a.status,
+            rating: a.score,
+            year: a.year
+          })));
+        }
+      } catch (err) {
+        console.error('Failed to fetch top anime:', err);
+      }
+    };
+    fetchPopular();
+  }, []);
+
+  // Search anime via API
+  useEffect(() => {
+    if (!searchQuery.trim()) return;
+    
+    const delayDebounceFn = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(searchQuery)}&limit=20`);
+        const data = await res.json();
+        if (data.data) {
+          setApiAnime(data.data.map(a => ({
+            id: a.mal_id,
+            title: a.title,
+            thumbnail: a.images.jpg.large_image_url,
+            description: a.synopsis,
+            episodes: a.episodes,
+            status: a.status,
+            rating: a.score,
+            year: a.year
+          })));
+        }
+      } catch (err) {
+        console.error('Search failed:', err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
   }, [searchQuery]);
+
+  const displayAnime = apiAnime.length > 0 ? apiAnime : animeData;
 
   return (
     <>
       {/* Search Bar */}
       <div className="max-w-7xl mx-auto px-6 pt-8">
         <div className="relative group max-w-md mx-auto">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-purple-400 transition-colors" />
+          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-purple-400 transition-colors ${isSearching ? 'animate-pulse text-purple-400' : ''}`} />
           <input
             type="text"
-            placeholder="Search anime..."
+            placeholder="Search all anime (API)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-white/5 border border-purple-500/20 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder:text-white/20"
@@ -181,9 +235,9 @@ function AnimePage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-12">
-        {filteredAnime.length > 0 ? (
+        {displayAnime.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredAnime.map((anime) => (
+            {displayAnime.map((anime) => (
               <Link
                 key={anime.id}
                 to={`/anime/${anime.id}`}
@@ -208,9 +262,16 @@ function AnimePage() {
                     </div>
                   </div>
                   <div className="p-4">
-                    <h3 className="font-bold text-lg group-hover:text-purple-400 transition-colors truncate">
-                      {anime.title}
-                    </h3>
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="font-bold text-lg group-hover:text-purple-400 transition-colors truncate">
+                        {anime.title}
+                      </h3>
+                      {anime.rating && (
+                        <span className="text-[10px] font-bold text-yellow-500 bg-yellow-500/10 px-1.5 py-0.5 rounded">
+                          ★{anime.rating}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-white/40 mt-2 line-clamp-2">
                       {anime.description}
                     </p>
@@ -254,8 +315,44 @@ function AnimePlayerPage() {
   const [server, setServer] = useState('VidSrc');
   const [isLoading, setIsLoading] = useState(true);
   const [activeGroup, setActiveGroup] = useState(0);
+  const [anime, setAnime] = useState(null);
+  const [isFetchingAnime, setIsFetchingAnime] = useState(true);
   
-  const anime = useMemo(() => animeData.find(a => a.id === parseInt(id)), [id]);
+  // Fetch anime details from API
+  useEffect(() => {
+    const fetchDetails = async () => {
+      setIsFetchingAnime(true);
+      try {
+        // Check local data first
+        const local = animeData.find(a => a.id === parseInt(id));
+        if (local) {
+          setAnime(local);
+        } else {
+          // Fetch from Jikan API
+          const res = await fetch(`https://api.jikan.moe/v4/anime/${id}`);
+          const data = await res.json();
+          if (data.data) {
+            const a = data.data;
+            setAnime({
+              id: a.mal_id,
+              title: a.title,
+              thumbnail: a.images.jpg.large_image_url,
+              description: a.synopsis,
+              episodes: a.episodes || 1000, // Fallback if episodes unknown
+              status: a.status,
+              rating: a.score,
+              year: a.year
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch anime details:', err);
+      } finally {
+        setIsFetchingAnime(false);
+      }
+    };
+    fetchDetails();
+  }, [id]);
 
   // Save progress
   useEffect(() => {
@@ -271,6 +368,15 @@ function AnimePlayerPage() {
       setActiveGroup(Math.floor((currentEp - 1) / 100));
     }
   }, [currentEp, server, anime]);
+
+  if (isFetchingAnime) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 text-center">
+        <div className="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin mb-4"></div>
+        <h2 className="text-xl font-bold">Loading Anime Details...</h2>
+      </div>
+    );
+  }
 
   if (!anime) {
     return (
@@ -301,7 +407,7 @@ function AnimePlayerPage() {
     const slug = anime.title.toLowerCase().replace(/\s+/g, '-');
     // Common patterns for anime embeds
     if (server === 'VidSrc') {
-      return `https://vidsrc.me/embed/anime?last_episode=1&title=${slug}&episode=${currentEp}`;
+      return `https://vidsrc.me/embed/anime?last_episode=1&title=${encodeURIComponent(anime.title)}&episode=${currentEp}`;
     } else if (server === 'V2') {
       return `https://vidsrc.to/embed/anime/${slug}/ep-${currentEp}`;
     } else if (server === 'V3') {
@@ -309,7 +415,7 @@ function AnimePlayerPage() {
     } else if (server === 'V4') {
       return `https://vidsrc.cc/v2/embed/anime/${slug}/${currentEp}`;
     }
-    return `https://vidsrc.me/embed/anime?last_episode=1&title=${slug}&episode=${currentEp}`;
+    return `https://vidsrc.me/embed/anime?last_episode=1&title=${encodeURIComponent(anime.title)}&episode=${currentEp}`;
   };
 
   return (
